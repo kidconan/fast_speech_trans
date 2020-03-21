@@ -10,6 +10,7 @@ import hparams
 import audio as Audio
 from text import text_to_sequence
 from utils import process_text, pad_1D, pad_2D
+from pad_skill import _pad_mel, _prepare_data
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -17,66 +18,115 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class FastSpeechDataset(Dataset):
     """ LJSpeech """
 
-    def __init__(self):
-        self.text = process_text(os.path.join("data", "train.txt"))
+    def __init__(self, csv_file, root_dir):
+        # self.text = process_text(os.path.join("data", "train.txt"))
+        """
+        Args:
+            csv_file (string): Path to the csv file with annotations.
+            root_dir (string): Directory with all the wavs.
+
+        """
+        self.landmarks_frame = pd.read_csv(csv_file, sep='|', header=None)
+        self.root_dir = root_dir
 
     def __len__(self):
-        return len(self.text)
+        # return len(self.text)
+        return len(self.landmarks_frame)
 
     def __getitem__(self, idx):
-        mel_gt_name = os.path.join(
-            hparams.mel_ground_truth, "ljspeech-mel-%05d.npy" % (idx+1))
-        mel_gt_target = np.load(mel_gt_name)
-        D = np.load(os.path.join(hparams.alignment_path, str(idx)+".npy"))
+        wav_name = os.path.join(self.root_dir, self.landmarks_frame.ix[idx, 0]) + '.wav'
+        text = self.landmarks_frame.ix[idx, 1]
+        alignment = np.load(hparams.alignment_path + '/' + str(idx) + '.npy')
 
-        character = self.text[idx][0:len(self.text[idx])-1]
-        character = np.array(text_to_sequence(
-            character, hparams.text_cleaners))
+        text = np.asarray(text_to_sequence(text, hparams.text_cleaners), dtype=np.int32)
+        mel = np.load(wav_name[:-4] + '.pt.npy')
+        # mel_input = np.concatenate([np.zeros([1,hparams.num_mels], np.float32), mel[:-1,:]], axis=0)
+        text_length = len(text)
+        pos_text = np.arange(1, text_length + 1)
+        pos_mel = np.arange(1, mel.shape[0] + 1)
 
-        sample = {"text": character,
-                  "mel_target": mel_gt_target,
-                  "D": D}
+        sample = {'text': text, 'mel': mel, 'text_length':text_length, 'pos_mel':pos_mel, 'pos_text':pos_text, 'alignment':alignment}
+
+        return sample
+        # mel_gt_name = os.path.join(
+        #     hparams.mel_ground_truth, "ljspeech-mel-%05d.npy" % (idx+1))
+        # mel_gt_target = np.load(mel_gt_name)
+        # D = np.load(os.path.join(hparams.alignment_path, str(idx)+".npy"))
+
+        # character = self.text[idx][0:len(self.text[idx])-1]
+        # character = np.array(text_to_sequence(
+        #     character, hparams.text_cleaners))
+
+        # sample = {"text": character,
+        #           "mel_target": mel_gt_target,
+        #           "D": D}
 
         return sample
 
 
 def reprocess(batch, cut_list):
-    texts = [batch[ind]["text"] for ind in cut_list]
-    mel_targets = [batch[ind]["mel_target"] for ind in cut_list]
-    Ds = [batch[ind]["D"] for ind in cut_list]
 
-    length_text = np.array([])
-    for text in texts:
-        length_text = np.append(length_text, text.shape[0])
+    text = [batch[ind]["text"] for ind in cut_list]
+    mel = [batch[ind]["mel"] for ind in cut_list]
+    # mel_input = [batch[ind]['mel_input'] for ind in cut_list]
+    text_length = [batch[ind]['text_length'] for ind in cut_list]
+    pos_mel = [batch[ind]['pos_mel'] for ind in cut_list]
+    pos_text= [batch[ind]['pos_text'] for ind in cut_list]
+    alignment = [batch[ind]['alignment'] for ind in cut_list]
+    
+    text = [i for i,_ in sorted(zip(text, text_length), key=lambda x: x[1], reverse=True)]
+    mel = [i for i, _ in sorted(zip(mel, text_length), key=lambda x: x[1], reverse=True)]
+    alignment = [i for i, _ in sorted(zip(alignment, text_length), key=lambda x: x[1], reverse=True)]
+    # mel_input = [i for i, _ in sorted(zip(mel_input, text_length), key=lambda x: x[1], reverse=True)]
+    pos_text = [i for i, _ in sorted(zip(pos_text, text_length), key=lambda x: x[1], reverse=True)]
+    pos_mel = [i for i, _ in sorted(zip(pos_mel, text_length), key=lambda x: x[1], reverse=True)]
+    text_length = sorted(text_length, reverse=True)
+    # PAD sequences with largest length of the batch
+    text = _prepare_data(text).astype(np.int32)
+    mel = _pad_mel(mel)
+    # mel_input = _pad_mel(mel_input)
+    pos_mel = _prepare_data(pos_mel).astype(np.int32)
+    pos_text = _prepare_data(pos_text).astype(np.int32)
+    alignment = _prepare_data(alignment).astype(np.int32)
 
-    src_pos = list()
-    max_len = int(max(length_text))
-    for length_src_row in length_text:
-        src_pos.append(np.pad([i+1 for i in range(int(length_src_row))],
-                              (0, max_len-int(length_src_row)), 'constant'))
-    src_pos = np.array(src_pos)
+    out = {"text": text,
+           "mel_target": mel,
+           "D": alignment,
+           "mel_pos": pos_mel,
+           "src_pos": pos_text,
+           "mel_max_len": int(max(text_length))}
+    
+    # texts = [batch[ind]["text"] for ind in cut_list]
+    # mel_targets = [batch[ind]["mel_target"] for ind in cut_list]
+    # Ds = [batch[ind]["D"] for ind in cut_list]
 
-    length_mel = np.array(list())
-    for mel in mel_targets:
-        length_mel = np.append(length_mel, mel.shape[0])
+    # length_text = np.array([])
+    # for text in texts:
+    #     length_text = np.append(length_text, text.shape[0])
 
-    mel_pos = list()
-    max_mel_len = int(max(length_mel))
-    for length_mel_row in length_mel:
-        mel_pos.append(np.pad([i+1 for i in range(int(length_mel_row))],
-                              (0, max_mel_len-int(length_mel_row)), 'constant'))
-    mel_pos = np.array(mel_pos)
+    # src_pos = list()
+    # max_len = int(max(length_text))
+    # for length_src_row in length_text:
+    #     src_pos.append(np.pad([i+1 for i in range(int(length_src_row))],
+    #                           (0, max_len-int(length_src_row)), 'constant'))
+    # src_pos = np.array(src_pos)
 
-    texts = pad_1D(texts)
-    Ds = pad_1D(Ds)
-    mel_targets = pad_2D(mel_targets)
+    # length_mel = np.array(list())
+    # for mel in mel_targets:
+    #     length_mel = np.append(length_mel, mel.shape[0])
 
-    out = {"text": texts,
-           "mel_target": mel_targets,
-           "D": Ds,
-           "mel_pos": mel_pos,
-           "src_pos": src_pos,
-           "mel_max_len": max_mel_len}
+    # mel_pos = list()
+    # max_mel_len = int(max(length_mel))
+    # for length_mel_row in length_mel:
+    #     mel_pos.append(np.pad([i+1 for i in range(int(length_mel_row))],
+    #                           (0, max_mel_len-int(length_mel_row)), 'constant'))
+    # mel_pos = np.array(mel_pos)
+
+    # texts = pad_1D(texts)
+    # Ds = pad_1D(Ds)
+    # mel_targets = pad_2D(mel_targets)
+
+
 
     return out
 
