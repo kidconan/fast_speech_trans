@@ -16,8 +16,8 @@ def get_D(alignment):
 
     return D
 
-if not os.path.exists('alignment'):
-    os.mkdir('alignment')
+if not os.path.exists('alignments'):
+    os.mkdir('alignments')
 check_point = './checkpoint/checkpoint_transformer_820000.pth.tar'
 para_file = t.load(check_point)
 
