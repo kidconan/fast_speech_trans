@@ -49,6 +49,7 @@ for epoch in range(1):
         attn_probs = attn_probs[0].sum(dim=0)
         attn_probs = attn_probs.data.cpu().argmax(dim=-1)
         attn_probs = attn_probs.numpy()
-        attn_probs = get_D(attn_probs)
-        np.save('./alignments/'+str(k)+'.npy', attn_probs)
+        print(attn_probs.shape)
+        # attn_probs = get_D(attn_probs)
+        # np.save('./alignments/'+str(k)+'.npy', attn_probs)
         k += 1
