@@ -1,5 +1,5 @@
 import numpy as np
-from ..Transformer-TTS import hparams as hp
+from ..TransformerTTS import hparams as hp
 
 def _pad_data(x, length):
     _pad = 0
