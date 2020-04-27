@@ -11,6 +11,7 @@ import audio as Audio
 from text import text_to_sequence
 from utils import process_text, pad_1D, pad_2D
 from pad_skill import _pad_mel, _prepare_data
+import pandas as pd
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
