@@ -39,6 +39,7 @@ alignment_path = "./alignments"
 checkpoint_path = "./model_new"
 logger_path = "./logger"
 mel_ground_truth = "./mels"
+data_path = './data/data/LJSpeech-1.1'
 
 batch_size = 64
 epochs = 1000
