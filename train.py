@@ -27,7 +27,7 @@ def main(args):
     print('Number of FastSpeech Parameters:', num_param)
 
     # Get dataset
-    dataset = FastSpeechDataset()
+    dataset = FastSpeechDataset(os.path.join(hp.data_path,'metadata.csv'), os.path.join(hp.data_path,'wavs')))
 
     # Optimizer and loss
     optimizer = torch.optim.Adam(
