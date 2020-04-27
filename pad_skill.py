@@ -1,5 +1,10 @@
+# _train.py
+import sys, os
+sys.path.append("..")
+sys.path.extend([os.path.join(root, name) for root, dirs, _ in os.walk("../") for name in dirs])
+
 import numpy as np
-from ..TransformerTTS import hparams as hp
+from TransformerTTS import hparams as hp
 
 def _pad_data(x, length):
     _pad = 0
