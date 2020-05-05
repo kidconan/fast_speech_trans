@@ -4,7 +4,7 @@ sys.path.append("..")
 sys.path.extend([os.path.join(root, name) for root, dirs, _ in os.walk("../") for name in dirs])
 
 import numpy as np
-from TransformerTTS import hyperparams as hp
+from TransformerTTS import hyperparams as hpq
 
 def _pad_data(x, length):
     _pad = 0
@@ -16,7 +16,7 @@ def _prepare_data(inputs):
 
 def _pad_per_step(inputs):
     timesteps = inputs.shape[-1]
-    return np.pad(inputs, [[0,0],[0,0],[0, hp.outputs_per_step - (timesteps % hp.outputs_per_step)]], mode='constant', constant_values=0.0)
+    return np.pad(inputs, [[0,0],[0,0],[0, hpq.outputs_per_step - (timesteps % hpq.outputs_per_step)]], mode='constant', constant_values=0.0)
 
 def _pad_mel(inputs):
     _pad = 0
