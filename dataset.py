@@ -74,6 +74,8 @@ def reprocess(batch, cut_list):
     pos_mel = [batch[ind]['pos_mel'] for ind in cut_list]
     pos_text= [batch[ind]['pos_text'] for ind in cut_list]
     alignment = [batch[ind]['alignment'] for ind in cut_list]
+
+    mel_max_len = max(list(map(lambda x: x.shape[0], mel)))
     
     text = [i for i,_ in sorted(zip(text, text_length), key=lambda x: x[1], reverse=True)]
     mel = [i for i, _ in sorted(zip(mel, text_length), key=lambda x: x[1], reverse=True)]
@@ -95,7 +97,7 @@ def reprocess(batch, cut_list):
            "D": alignment,
            "mel_pos": pos_mel,
            "src_pos": pos_text,
-           "mel_max_len": int(max(text_length))}
+           "mel_max_len": mel_max_len}
     
     # texts = [batch[ind]["text"] for ind in cut_list]
     # mel_targets = [batch[ind]["mel_target"] for ind in cut_list]
