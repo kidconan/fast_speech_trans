@@ -48,7 +48,7 @@ def get_mask_from_lengths(lengths, max_len=None):
 
 def get_WaveGlow():
     waveglow_path = os.path.join("waveglow", "pretrained_model")
-    waveglow_path = os.path.join(waveglow_path, "waveglow_256channels.pt")
+    waveglow_path = os.path.join(waveglow_path, "waveglow_256channels_ljs_v2.pt")
     wave_glow = torch.load(waveglow_path)['model']
     wave_glow = wave_glow.remove_weightnorm(wave_glow)
     wave_glow.cuda().eval()

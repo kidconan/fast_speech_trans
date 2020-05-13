@@ -62,13 +62,15 @@ if __name__ == "__main__":
     Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
         "results", words + "_" + str(num) + "_griffin_lim.wav"))
 
+    utils.plot_data([mel.numpy(), mel_postnet.numpy()])
+
     wave_glow = utils.get_WaveGlow()
     waveglow.inference.inference(mel_postnet_torch, wave_glow, os.path.join(
         "results", words + "_" + str(num) + "_waveglow.wav"))
 
-    tacotron2 = utils.get_Tacotron2()
-    mel_tac2, _, _ = utils.load_data_from_tacotron2(words, tacotron2)
-    waveglow.inference.inference(torch.stack([torch.from_numpy(
-        mel_tac2).cuda()]), wave_glow, os.path.join("results", "tacotron2.wav"))
+    # tacotron2 = utils.get_Tacotron2()
+    # mel_tac2, _, _ = utils.load_data_from_tacotron2(words, tacotron2)
+    # waveglow.inference.inference(torch.stack([torch.from_numpy(
+    #     mel_tac2).cuda()]), wave_glow, os.path.join("results", "tacotron2.wav"))
 
-    utils.plot_data([mel.numpy(), mel_postnet.numpy(), mel_tac2])
+    # utils.plot_data([mel.numpy(), mel_postnet.numpy(), mel_tac2])

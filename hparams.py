@@ -44,7 +44,7 @@ logger_path = "./logger"
 mel_ground_truth = "./mels"
 data_path = './data/data/LJSpeech-1.1'
 
-batch_size = 64
+batch_size = 128
 epochs = 1000
 n_warm_up_step = 4000
 
