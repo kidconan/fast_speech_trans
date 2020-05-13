@@ -48,8 +48,6 @@ def get_mel_from_wav(audio):
 
 
 def inv_mel_spec(mel, out_filename, griffin_iters=60):
-    import importlib,sys
-    importlib.reload(sys)
     mel = torch.stack([mel])
     # mel = torch.stack([torch.from_numpy(_denormalize(mel.numpy()))])
     mel_decompress = _stft.spectral_de_normalize(mel)
