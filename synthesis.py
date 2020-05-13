@@ -61,8 +61,10 @@ if __name__ == "__main__":
     if not os.path.exists("results"):
         os.mkdir("results")
     print(os.getcwd())
-    Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
-        "results", words + "_" + str(num) + "_griffin_lim.wav"))
+    file_name = os.getcwd() + '/results/' + words + "_" + str(num) + "_griffin_lim.wav"
+    Audio.tools.inv_mel_spec(mel_postnet, file_name)
+    # Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
+    #     "results", words + "_" + str(num) + "_griffin_lim.wav"))
 
     utils.plot_data([mel.numpy(), mel_postnet.numpy()])
 
