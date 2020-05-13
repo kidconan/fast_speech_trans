@@ -49,10 +49,8 @@ def synthesis(model, text, alpha=1.0):
 
 if __name__ == "__main__":
     # Test
-    import importlib,sys
-    importlib.reload(sys)
+    # num = 191000
     num = 191000
-    # num = 112000
     alpha = 1.0
     model = get_FastSpeech(num)
     words = "Let’s go out to the airport. The plane landed ten minutes ago."
@@ -62,6 +60,8 @@ if __name__ == "__main__":
 
     if not os.path.exists("results"):
         os.mkdir("results")
+    print(os.path.join(
+        "results", words + "_" + str(num) + "_griffin_lim.wav"))
     Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
         "results", words + "_" + str(num) + "_griffin_lim.wav"))
 
