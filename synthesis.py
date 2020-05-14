@@ -60,17 +60,17 @@ if __name__ == "__main__":
 
     if not os.path.exists("results"):
         os.mkdir("results")
-    print(os.getcwd())
-    file_name = os.getcwd() + '/results/' + words + "_" + str(num) + "_griffin_lim.wav"
-    Audio.tools.inv_mel_spec(mel_postnet, file_name)
-    # Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
-    #     "results", words + "_" + str(num) + "_griffin_lim.wav"))
+    print(os.path.join(
+        "results", words + "_" + str(num) + "_griffin_lim.wav"))
+    # Audio.tools.inv_mel_spec(mel_postnet, file_name)
+    # # Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
+    # #     "results", words + "_" + str(num) + "_griffin_lim.wav"))
 
-    utils.plot_data([mel.numpy(), mel_postnet.numpy()])
+    # utils.plot_data([mel.numpy(), mel_postnet.numpy()])
 
-    wave_glow = utils.get_WaveGlow()
-    waveglow.inference.inference(mel_postnet_torch, wave_glow, os.path.join(
-        "results", words + "_" + str(num) + "_waveglow.wav"))
+    # wave_glow = utils.get_WaveGlow()
+    # waveglow.inference.inference(mel_postnet_torch, wave_glow, os.path.join(
+    #     "results", words + "_" + str(num) + "_waveglow.wav"))
 
     # tacotron2 = utils.get_Tacotron2()
     # mel_tac2, _, _ = utils.load_data_from_tacotron2(words, tacotron2)
