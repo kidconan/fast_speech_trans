@@ -64,7 +64,7 @@ if __name__ == "__main__":
     #     "results", "test" + "_" + str(num) + "_griffin_lim.wav"))
     # Audio.tools.inv_mel_spec(mel_postnet, file_name)
     Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
-        "results", "test" + "_" + str(num) + "_griffin_lim.wav"))
+        "results", "test" + "_" + str(num) + "_griffin_lim.npy"))
 
     utils.plot_data([mel.numpy(), mel_postnet.numpy()])
 
