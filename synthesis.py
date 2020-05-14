@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     wave_glow = utils.get_WaveGlow()
     waveglow.inference.inference(mel_postnet_torch, wave_glow, os.path.join(
-        "results", words + "_" + str(num) + "_waveglow.wav"))
+        "results", "test" + "_" + str(num) + "_waveglow.wav"))
 
     # tacotron2 = utils.get_Tacotron2()
     # mel_tac2, _, _ = utils.load_data_from_tacotron2(words, tacotron2)
