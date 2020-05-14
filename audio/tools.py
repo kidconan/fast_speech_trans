@@ -63,7 +63,7 @@ def inv_mel_spec(mel, out_filename, griffin_iters=60):
 
     audio = audio.squeeze()
     audio = audio.cpu().numpy()
-    np.save(audio_path, audio)
+    np.save(out_filename, audio)
     # print(out_filename)
     # audio_path = out_filename
     # write(audio_path, hparams.sampling_rate, audio)
