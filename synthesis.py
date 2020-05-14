@@ -66,10 +66,8 @@ if __name__ == "__main__":
     Audio.tools.inv_mel_spec(mel_postnet, os.path.join(
         "results", "test" + "_" + str(num) + "_griffin_lim.wav"))
 
-    np.save(os.path.join(mel.numpy(), 
-        "results", "test" + "_" + str(num) + "_griffin_lim_mel.npy"))
-    np.save(os.path.join(mel_postnet.numpy(), 
-        "results", "test" + "_" + str(num) + "_griffin_lim_pos_mel.npy"))
+    np.save(os.path.join("results", "test" + "_" + str(num) + "_griffin_lim_mel.npy"), mel.numpy())
+    np.save(os.path.join("results", "test" + "_" + str(num) + "_griffin_lim_pos_mel.npy"), mel_postnet.numpy())
     # utils.plot_data([mel.numpy(), mel_postnet.numpy()])
 
     wave_glow = utils.get_WaveGlow()
